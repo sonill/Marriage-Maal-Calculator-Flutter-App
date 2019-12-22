@@ -93,6 +93,7 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
   List textEditingControllers = [];
   List _matchScores = []; // it will be updated from futurebuilder. scroll to bottom
   int radioGroup;
+  List _settings = [];
 
   Widget checkbox(int index, String referenceVarName ) {
 
@@ -219,7 +220,6 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
   @override
   Widget build(BuildContext context) {
 
-
     final PlayersDataModel playersDataModel = Provider.of<PlayersDataModel>(context);
     
     return FutureBuilder(
@@ -229,6 +229,8 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
           
           // generate _matchScores data
           _matchScores = playersDataModel.getMatchScores();
+
+          _settings = playersDataModel.getSettings();
 
           for(int i = 0; i < _matchScores.length; i++){
             textEditingControllers.add(TextEditingController());
@@ -279,22 +281,167 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
 
   // --------------------------------------------------------------
 
+  int maalSeen(_maal ){
+    return (_maal * _matchScores.length);
+  }
+
+  int maalNotSeen(_totalMaal){
+    return _totalMaal + _settings[0]['unseen'];
+  }
+
+  int seenLessPoints(_maal, _totalMaal){
+    return maalSeen( _maal ) -  _totalMaal;
+  }
 
   void _verifyScores(){
 
     bool _winnerSelected = false;
+    int _totalMaal = 0;
+    bool _dubliWin = false;
 
     for(int i = 0; i < _matchScores.length; i++ ){
       String maal = textEditingControllers[i].text;
       int maalInt = (maal.length > 0) ? int.parse(maal) : 0;
       _matchScores[i]['maal'] = maalInt;
 
+      _totalMaal = _totalMaal + maalInt;
+
       // find winner
       if( _matchScores[i]['win'] == true ){
+        var _tempData = _matchScores[i];
+
+        _matchScores.removeAt(i);
+        _matchScores.add(_tempData);
         _winnerSelected = true;
+
+        // dubli
+        if( _matchScores[i]['dubli'] ){
+          _dubliWin = true;
+        }
+
       }
 
     }
+
+    if( _winnerSelected ){
+      // print( _settings );
+
+      // calculate results
+
+      for(int i = 0; i < _matchScores.length; i++ ){
+        int _maal = _matchScores[i]['maal'];
+        bool _seen = _matchScores[i]['seen'];
+        bool _dubli = _matchScores[i]['dubli'];
+        bool _win = _matchScores[i]['win'];
+        int _results = 0;
+        int _winnerPoints = 0;
+
+        // winner will always be last
+
+        if( !_win ){
+
+          if( _dubliWin ){
+
+            if( _settings[0]['enable_dubli'] ){
+
+              if( _seen ){
+
+                if(_dubli){
+                  
+                    // won in dubli, seen, dubli, dubli enabled
+                    // less points
+                    _results = maalSeen( _maal ) -  _totalMaal;
+
+                }
+                else{
+                  // won in dubli, seen, not dubli, dubli enabled
+                  _results =  maalSeen( _maal ) - (_totalMaal + _settings[0]['dubli']);
+                }
+
+              }
+              else{
+                // won in dubli, not seen, dubli enabled
+                _results = maalNotSeen(_totalMaal); 
+              }
+
+            }
+            else{
+
+              // dubli not enabled
+              
+              if( _seen ){
+                // dubli not enabled
+                // won in dubli, seen
+                // same for dubli and no dubli
+                _results = maalSeen( _maal ) -  (_totalMaal + _settings[0]['seen']);
+
+              }
+              else{
+                // won in dubli, not seen, dubli not enabled
+                _results = maalNotSeen(_totalMaal); 
+              }
+
+            }
+
+          }
+          else{
+
+            // game not won in dubli
+            // regular points
+
+            if( _settings[0]['enable_dubli'] ){
+
+              if( _seen ){
+
+                if(_dubli){
+                  
+                    // seen, dubli, dubli enabled
+                    // less points
+                    _results = seenLessPoints(_maal, _totalMaal);
+
+                }
+                else{
+                  // seen, not dubli, dubli enabled
+                  _results =  maalSeen( _maal ) - (_totalMaal + _settings[0]['seen']);
+                }
+
+              }
+              else{
+                // not seen, dubli enabled
+                _results = maalNotSeen(_totalMaal); 
+              }
+
+            }
+            else{
+
+              // dubli not enabled
+              
+              if( _seen ){
+                // dubli not enabled
+                // seen
+                // same for dubli and no dubli
+                _results = maalSeen( _maal ) -  (_totalMaal + _settings[0]['seen']);
+
+              }
+              else{
+                // not seen, dubli not enabled
+                _results = maalNotSeen(_totalMaal); 
+              }
+
+            }
+
+          }
+          
+        }
+        else{
+          // if win
+        }
+        
+      }
+
+    }
+
+    
 
 
     if( !_winnerSelected ){
@@ -335,8 +482,7 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
 
     // calculatResults();
 
-    // Navigator.pushNamed(context, '/results');
-    Navigator.of(context).pushNamed('/results', arguments: {'data': _matchScores});
+    // Navigator.of(context).pushNamed('/results', arguments: {'data': _matchScores});
 
   } // function end
 

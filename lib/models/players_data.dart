@@ -33,7 +33,7 @@ class PlayersDataModel extends ChangeNotifier{
 
     if( _matchScores.length  > 0 ) return false;
     
-    return await getPlayersFromSharedPreferences().then((bool){
+    return await getPlayersFromSharedPreferences().then((bool) async {
       // reset old scores
       _matchScores = [];
 
@@ -41,7 +41,9 @@ class PlayersDataModel extends ChangeNotifier{
         _matchScores.add({'name' : _players[i], 'maal' : 0, 'seen' : false, 'dubli' : false, 'win' : false});
       }
 
-      return true;
+      return await getSettingsFromSharedPreferences();
+
+      // return true;
 
     });
     
@@ -155,7 +157,6 @@ class PlayersDataModel extends ChangeNotifier{
   Future<bool> updateSettingsFromSharedPreferences(String settingsKey, int data) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return await prefs.setInt('sanil_mmc_' + settingsKey, data );
-
   }
 
 }
