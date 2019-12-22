@@ -1,33 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/globals.dart' as globals;
-// import '../widgets/alert_dialog.dart';
 
-class MyButtons extends StatefulWidget {
-  
-  final String buttonLabel;
-  final String color;
-  final double margin;
-  final String buttonType;
-  final Function callback;
-
-  MyButtons(this.buttonLabel, this.callback, this.buttonType, [this.color, this.margin]);
-
-  @override
-  _MyButtonsState createState() {
-
-    return _MyButtonsState(
-      this.buttonLabel, 
-      this.callback, 
-      this.buttonType,
-      (this.color == null) ? 'blue' : this.color, 
-      (this.margin == null) ? 8 : this.margin
-    );
-
-  } 
-
-}
-
-class _MyButtonsState extends State<MyButtons> {
+class MyButtons extends StatelessWidget {
 
   final String buttonLabel;
   final String color;
@@ -35,10 +9,11 @@ class _MyButtonsState extends State<MyButtons> {
   final String buttonType;
   final Function callback;
 
-  _MyButtonsState(this.buttonLabel, this.callback,  this.buttonType, this.color, this.margin);
+  const MyButtons(this.buttonLabel, this.callback,  this.buttonType, this.color, this.margin);
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       width: double.infinity,
       margin: EdgeInsets.only(bottom: margin),
@@ -75,9 +50,7 @@ class _MyButtonsState extends State<MyButtons> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        onPressed: () {
-          callback(context);
-        },
+        onPressed: () => callback(),
       ),
     );
   }

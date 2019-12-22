@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class PlayersName extends StatelessWidget {
+import '../models/players_data.dart';
+
+class PlayersNameUI extends StatelessWidget {
   final String label;
   final int index;
-  final Function callback;
 
-  const PlayersName(this.label, this.callback, this.index);
+  const PlayersNameUI(this.label, this.index);
 
   @override
   Widget build(BuildContext context) {
+
+    final PlayersDataModel playersDataModel = Provider.of<PlayersDataModel>(context);
+    
     return Container(
       height: 60.0,
       margin: new EdgeInsets.only(bottom: 10.0),
@@ -34,6 +39,7 @@ class PlayersName extends StatelessWidget {
             Expanded(
               child: Text(
                 '$label',
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -44,7 +50,7 @@ class PlayersName extends StatelessWidget {
               turns: AlwaysStoppedAnimation(45 / 360),
               child: IconButton(
                 icon: Icon(Icons.add), 
-                onPressed: () => callback(index),
+                onPressed: () => playersDataModel.removePlayers(index),
               ),
             )
           ],

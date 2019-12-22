@@ -1,60 +1,77 @@
+// import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import '../widgets/players.dart';
+import 'package:provider/provider.dart';
+
 import '../models/players_data.dart';
+import '../widgets/players_name_ui.dart';
 import '../widgets/buttons.dart';
-import '../widgets/alert_dialog.dart';
+import '../widgets/alert_dialog_new_player.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 import '../models/globals.dart' as globals;
 
-// void askPlayersNameDialog()  {
-//   print('asdfasdf');
-// }
 
+class PlayersNameScreen extends StatelessWidget {
 
-class PlayersNameScreen extends StatefulWidget {
-  @override
-  _PlayersNameScreenState createState() => _PlayersNameScreenState();
-}
-
-PlayersData _playersObj = PlayersData();
-List _players = _playersObj.getPlayers();
-
-class _PlayersNameScreenState extends State<PlayersNameScreen> {
-
-  void removePlayers(index){
-    _playersObj.removePlayer(index);
-
-    if(_players.length < 1 ){
-      Navigator.pop(context);
-    }
-    else{
-      setState((){});
-    }
-
-  }
-
-  
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.all(globals.mainContainerPadding),
-            child: Column(
-              children: <Widget>[
-                for(var i=0; i < _players.length; i++) PlayersName(_players[i]['name'], removePlayers, i ),
-                SizedBox(
-                  height: 5,
-                ),
-                MyButtons('Add More Players', askPlayersNameDialog, 'solid'),
-                MyButtons('Start New Game', (){}, 'solid', 'green'),
-              ],
-            ),
-            ),
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        body: Builder(
+          builder: (context) => getBodyWithFutureBuilder(context),
         )
-        ),
+      );
+    }
+
+  Widget getBodyWithFutureBuilder(context){
+    final PlayersDataModel playersDataModel = Provider.of<PlayersDataModel>(context);
+
+    return FutureBuilder(
+      future: playersDataModel.getPlayersFromSharedPreferences(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          var _players = playersDataModel.playersName;
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(globals.mainContainerPadding),
+                child: Column(
+                  children: <Widget>[
+                    for (var i = 0; i < _players.length; i++)
+                      PlayersNameUI(_players[i], i),
+                      
+                    SizedBox( height: 5, ),
+                    MyButtons('Add More Players', (){
+                      askPlayersNameDialog(context, (){
+                          // Navigator.pop(context,);
+                          Navigator.of(context).pop();
+                        });
+                      } , 'solid', 'blue', 8
+                    ),
+                    Container(
+                      child: ( _players.length > 1 ) 
+                      ? 
+                      MyButtons('Start New Game', () {
+                        Navigator.pushReplacementNamed(context, '/new_game');
+                      }, 'solid', 'green', 8)
+                      :
+                      SizedBox(),
+                    )
+                  ],
+                ),
+              ),
+            )
+          );
+        }
+        else{
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      }
     );
+
+
+    
   }
+
 }

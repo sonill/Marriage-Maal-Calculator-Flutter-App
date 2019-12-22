@@ -18,6 +18,8 @@ environment:
 
 dependencies:
   flutter_svg: ^0.15.0
+  provider: ^3.2.0
+  shared_preferences: 
   flutter:
     sdk: flutter
 

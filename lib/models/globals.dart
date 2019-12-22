@@ -1,6 +1,6 @@
 library globals;
 
-const int blueColor = 0xff0447EED;
+const int blueColor = 0xff447EED;
 const int greenColor = 0xff27AE60;
 const double mainContainerPadding = 15.0;
 
