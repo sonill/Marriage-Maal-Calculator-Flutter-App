@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import './screens/welcome.dart';
+import './screens/welcome.dart';
 import './screens/players_name.dart';
 import './screens/score_board_screen.dart';
 import './screens/settings_screen.dart';
@@ -25,13 +25,13 @@ class MyApp extends StatelessWidget {
         ),
         initialRoute: '/',
         routes: {
-          // '/': (context) => WelcomeScreen(),
+          '/': (context) => WelcomeScreen(),
           '/players': (context) => PlayersNameScreen(),
           '/new_game': (context) => ScoreBoardScreen(),
           '/settings': (context) => SettingsScreen(),
           '/results': (context) => ResultScreen(),
         },
-        home: ScoreBoardScreen(),
+        // home: ScoreBoardScreen(),
       ),
     );
   }

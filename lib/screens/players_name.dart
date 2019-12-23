@@ -51,7 +51,8 @@ class PlayersNameScreen extends StatelessWidget {
                       child: ( _players.length > 1 ) 
                       ? 
                       MyButtons('Start New Game', () {
-                        Navigator.pushReplacementNamed(context, '/new_game');
+                        Navigator.of(context).pushReplacementNamed('/new_game', arguments: {'reset':true});
+                        // Navigator.pushReplacementNamed(context, '/new_game');
                       }, 'solid', 'green', 8)
                       :
                       SizedBox(),

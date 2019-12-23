@@ -14,17 +14,10 @@ class ResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final routesData =  ModalRoute.of(context).settings.arguments as Map<String,List>;
-
-    // final PlayersDataModel playersDataModel = Provider.of<PlayersDataModel>(context);
-    // final List _settings = playersDataModel.
-
-
-    // print('routes');
-    print(routesData['data']);
+    final routesData =  ModalRoute.of(context).settings.arguments as Map;
 
     return Scaffold(
-      body: resultScreenBody(context, routesData['data']),
+      body: resultScreenBody(context, routesData),
     );
   }
 
@@ -32,7 +25,12 @@ class ResultScreen extends StatelessWidget {
   // ---------------------------------------------------------------
 
 
-  Widget resultScreenBody(context, List results ){
+  Widget resultScreenBody(context, Map args ){
+
+    List _results = args['data'];
+    var _winnerData = args['winner'];
+
+    // print(_winnerData['name']);
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -40,17 +38,25 @@ class ResultScreen extends StatelessWidget {
           padding: EdgeInsets.all(globals.mainContainerPadding),
           child: Column(
             children: <Widget>[
-              for (var i = 0; i < results.length; i++)
-                ResultsUI(results[i]),
-                
+              ResultsUI( {'name' : 'Total Maal', 'results' : args['totalMaal'], 'titleRow' : true}),
+              ResultsUI( _winnerData),
+
+              Column(
+                children: <Widget>[
+                  for (var i = 0; i < _results.length; i++)
+                  ( _winnerData['name'] != _results[i]['name']) ? ResultsUI( _results[i]) : SizedBox(),
+                ],
+              ),
+
               SizedBox( height: 5, ),
 
               MyButtons('Start New Game', () {
-                Navigator.pushReplacementNamed(context, '/new_game');
+                // Navigator.pushReplacementNamed(context, '/new_game');
+                Navigator.of(context).pushReplacementNamed('/new_game', arguments: {'reset':true});
               }, 'solid', 'green', 8),
 
               MyButtons('Manage Players', () {
-                // Navigator.pushReplacementNamed(context, '/new_game');
+                Navigator.pushReplacementNamed(context, '/players');
               }, 'bordered', 'blue', 8)
               
             ],
@@ -59,4 +65,6 @@ class ResultScreen extends StatelessWidget {
       )
     );
   }
+
+
 }
