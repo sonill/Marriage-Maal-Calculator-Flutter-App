@@ -236,7 +236,6 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
     final PlayersDataModel playersDataModel = Provider.of<PlayersDataModel>(context);
     final routesData =  ModalRoute.of(context).settings.arguments as Map;
 
-    print( 'first boot = $firstBoot' );
 
     if( routesData['reset'] != null && routesData['reset'] == true) {
       firstBoot = true;

@@ -51,7 +51,7 @@ class WelcomeScreen extends StatelessWidget {
         children: <Widget>[
           svg,
           Padding(
-            padding: const EdgeInsets.only(top: 10, bottom: 30),
+            padding: const EdgeInsets.only(top: 10, bottom: 20),
             child: Text(
               'Marriage Maal Calculator',
               style: TextStyle(
@@ -62,6 +62,8 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
           _button,
+          SizedBox(height: 40),
+          Text('www.sanil.com.np'),
         ],
       ),
     );

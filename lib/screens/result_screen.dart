@@ -30,8 +30,6 @@ class ResultScreen extends StatelessWidget {
     List _results = args['data'];
     var _winnerData = args['winner'];
 
-    // print(_winnerData['name']);
-
     return SafeArea(
       child: SingleChildScrollView(
         child: Container(

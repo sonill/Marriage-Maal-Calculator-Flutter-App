@@ -39,7 +39,11 @@ class SettingsBody extends StatelessWidget {
         SingleRow(context, 'Unseen Points', 'Pointed gained by winner through players who have not seen the joker card.', false, 'unseen' ),
         SingleRow(context, 'Dubli', 'If ON, Dubli game points will be automatically calculated.', true, 'enable_dubli'),
         SingleRow(context, 'Dubli Points', 'Points gained by winner by playing Dubli.', false, 'dubli' ),
-        SingleRow(context, 'Murder', 'If ON, Points of unseen players will not be counted.', true, 'murder'),
+        // SingleRow(context, 'Murder', 'If ON, Points of unseen players will not be counted.', true, 'murder'),
+        SizedBox(height: 40),
+        Text('Designed & Developed by'),
+        SizedBox(height: 5),
+        Text('www.sanil.com.np', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,)),
       ],
     );
   }
