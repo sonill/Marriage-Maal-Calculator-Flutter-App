@@ -327,6 +327,7 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
     bool _winnerSelected = false;
     int _winIndex;
     int _totalMaal = 0;
+    int _totalMaalFinal = 0;
     bool _dubliWin = false;
     int _totalWinningPoints = 0;
 
@@ -338,6 +339,7 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
       // total maal count
       if( _matchScores[i]['seen'] == true ){
         _totalMaal +=  maalInt;
+        _totalMaalFinal +=  maalInt;
       }
 
 
@@ -349,6 +351,10 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
         // dubli
         if( _matchScores[i]['dubli'] ){
           _dubliWin = true;
+          _totalMaalFinal = _totalMaalFinal + _settings[0]['seen'] + _settings[0]['dubli'];
+        }
+        else{
+          _totalMaalFinal +=  _settings[0]['seen'];
         }
 
       }
@@ -394,18 +400,18 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
                 }
                 else{
                   // won in dubli, seen, not dubli, dubli enabled
-                  int _results =  maalSeen( _maal ) - (_totalMaal + _settings[0]['dubli']);
+                  int _results =  maalSeen( _maal ) - (_totalMaal + _settings[0]['seen'] + _settings[0]['dubli']);
                   _matchScores[i]['results'] = _results;
                   
                   // update total winning points
-                  updateTotalWinningPoints(_results);
+                  updateTotalWinningPoints( _results );
 
                 }
 
               }
               else{
                 // won in dubli, not seen, dubli enabled
-                int _results = maalNotSeen(_totalMaal); 
+                int _results = maalNotSeen(_totalMaal + _settings[0]['dubli']); 
                 _matchScores[i]['results'] = _results;
                   
                 // update total winning points
@@ -545,7 +551,7 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
       
     }
 
-    Navigator.of(context).pushReplacementNamed('/results', arguments: {'data': _matchScores, 'totalMaal' : _totalMaal, 'winner' : _matchScores[_winIndex]});
+    Navigator.of(context).pushReplacementNamed('/results', arguments: {'data': _matchScores, 'totalMaal' : _totalMaalFinal, 'winner' : _matchScores[_winIndex]});
 
   } // function end
 

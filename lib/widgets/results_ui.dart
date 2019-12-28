@@ -26,9 +26,13 @@ class _ResultsUIState extends State<ResultsUI> {
     
 
     if( widget.args['win'] != null && widget.args['win'] == true  ) _extraTextList.add('Winner');
-    if( widget.args['seen'] != null && widget.args['seen'] == true  ) _extraTextList.add('Seen');
-    if( widget.args['dubli'] != null && widget.args['dubli'] == true  ) _extraTextList.add('Dubli');
-    if( widget.args['maal'] != null ) _extraTextList.add('Maal : ' + widget.args['maal'].toString());
+    if( widget.args['seen'] != null && widget.args['seen'] == true  ){
+      _extraTextList.add('Seen');
+      if( widget.args['dubli'] != null && widget.args['dubli'] == true  ) _extraTextList.add('Dubli');  
+      if( widget.args['maal'] != null ) _extraTextList.add('Maal : ' + widget.args['maal'].toString());
+    } 
+
+
 
     String _extraText = _extraTextList.join(', ');
 
