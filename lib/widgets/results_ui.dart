@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
-
-// import '../models/players_data.dart';
 import '../models/globals.dart' as globals;
 
 class ResultsUI extends StatefulWidget {
@@ -20,10 +17,10 @@ class _ResultsUIState extends State<ResultsUI> {
   Widget build(BuildContext context) {
 
     final String _name = widget.args['name'];
-    final int _result = widget.args['results'];
+    int _result = widget.args['results'];
     final bool _titleRow = (widget.args['titleRow'] != null) ? widget.args['titleRow'] : false;
     List<String> _extraTextList = [];
-    
+
 
     if( widget.args['win'] != null && widget.args['win'] == true  ) _extraTextList.add('Winner');
     if( widget.args['seen'] != null && widget.args['seen'] == true  ){
@@ -31,7 +28,20 @@ class _ResultsUIState extends State<ResultsUI> {
       if( widget.args['dubli'] != null && widget.args['dubli'] == true  ) _extraTextList.add('Dubli');  
       if( widget.args['maal'] != null ) _extraTextList.add('Maal : ' + widget.args['maal'].toString());
     } 
+    else{
+      if( !_titleRow  ) {
+        _extraTextList.add('Maal Not Seen');
+      }
+      else{
+        final List _settings = widget.args['settings'];
+        _extraTextList.add('Seen: +' + _settings[0]['seen'].toString());
+        _extraTextList.add('Not Seen: +' + _settings[0]['unseen'].toString());
 
+        if( widget.args['dubli'] != null && widget.args['dubli'] == true && _settings[0]['enable_dubli'] == 1  ){
+          _result += _settings[0]['dubli'];
+        }
+      }
+    }
 
 
     String _extraText = _extraTextList.join(', ');
@@ -103,11 +113,16 @@ class _ResultsUIState extends State<ResultsUI> {
               duration: Duration(milliseconds: 500),
               // The green box must be a child of the AnimatedOpacity widget.
               child: Container(
-                height: _visible ? 27.0 : 0.0,
+                height: _visible ? 34.0 : 0.0,
                 alignment: Alignment.topLeft,
                 // margin: EdgeInsets.only(top: 15),
                 margin: EdgeInsets.only(top: 45, left: 15),
-                child: Text("$_extraText")
+                child: Text(
+                  "$_extraText",
+                  style: TextStyle(
+                    color: (_titleRow) ? Colors.white : Colors.black,
+                  ),
+                )
               ),
             ),
           ],

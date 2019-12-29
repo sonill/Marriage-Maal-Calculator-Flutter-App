@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/players_data.dart';
 import '../widgets/buttons.dart';
+import '../models/calculate_results.dart';
 import '../models/globals.dart' as globals;
 
 
@@ -159,7 +160,7 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
           ),
         ),
         checkbox( index, 'seen' ),
-        checkbox( index, 'dubli' ),
+        if (_settings[0]['enable_dubli'] == 1 )  checkbox( index, 'dubli' ),
         Container(
           width: 40, 
           child: Radio(
@@ -208,7 +209,7 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
                 )
               ),
               _ScoreBoardHeading('Seen'),
-              _ScoreBoardHeading('Dubli'),
+              if (_settings[0]['enable_dubli'] == 1 ) _ScoreBoardHeading('Dubli'),
               _ScoreBoardHeading('Win'),
             ],
           ),
@@ -273,7 +274,48 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
                     children: <Widget>[
                       scoreBoard(context),
                       SizedBox(height: 30),
-                      MyButtons('View Results', () => _verifyScores(), 'solid', 'green', 8),
+                      MyButtons('View Results', (){
+                        
+                        CalculateResults calculateResults = CalculateResults(_matchScores, _settings, textEditingControllers);
+
+                        bool _isWinnerSelected = calculateResults.isWinnerSelected();
+
+                        if(!_isWinnerSelected){
+                          // winner is not selected
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Please select a winner'),
+                                // content: Text(
+                                //   'You need a player'
+                                // ),
+                                actions: <Widget>[
+                                  MaterialButton(
+                                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                                    color: Colors.blue,
+                                    textColor: Colors.white,
+                                    child: Text('OK'),
+                                    elevation: 0,
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            }
+                          );
+                        
+                        }
+
+                        else{
+                          Map finalMatchScores = calculateResults.calcResults( _isWinnerSelected );
+
+                          Navigator.of(context).pushReplacementNamed('/results', arguments: {'data': finalMatchScores['matchScores'], 'totalMaal' : finalMatchScores['totalMaal'], 'dubliWin' : finalMatchScores['dubliWin'], 'winner' : finalMatchScores['winnerData'], 'settings' : _settings});
+
+                        }
+
+                      }, 'solid', 'green', 8),
                       MyButtons('Manage Players', () {
                         Navigator.pushReplacementNamed(context, '/players');
                       }, 'bordered', 'blue', 8),
@@ -308,252 +350,254 @@ class _ScoreBoardScreenBodyState extends State<ScoreBoardScreenBody> {
 
   // --------------------------------------------------------------
 
-  int maalSeen(_maal ){
-    return (_maal * _matchScores.length);
-  }
+  
 
-  int maalNotSeen(_totalMaal){
-    int _number =  _totalMaal + _settings[0]['unseen'];
-    // return negative value
-    return _number*(-1);
-  }
+  // int maalSeen(_maal ){
+  //   return (_maal * _matchScores.length);
+  // }
 
-  int seenLessPoints(_maal, _totalMaal){
-    return maalSeen( _maal ) -  _totalMaal;
-  }
+  // int maalNotSeen(_totalMaal){
+  //   int _number =  _totalMaal + _settings[0]['unseen'];
+  //   // return negative value
+  //   return _number*(-1);
+  // }
 
-  void _verifyScores(){
+  // int seenLessPoints(_maal, _totalMaal){
+  //   return maalSeen( _maal ) -  _totalMaal;
+  // }
 
-    bool _winnerSelected = false;
-    int _winIndex;
-    int _totalMaal = 0;
-    int _totalMaalFinal = 0;
-    bool _dubliWin = false;
-    int _totalWinningPoints = 0;
+  // void _verifyScores(){
 
-    for(int i = 0; i < _matchScores.length; i++ ){
-      String maal = textEditingControllers[i].text;
-      int maalInt = (maal.length > 0) ? int.parse(maal) : 0;
-      _matchScores[i]['maal'] = maalInt;
+  //   bool _winnerSelected = false;
+  //   int _winIndex;
+  //   int _totalMaal = 0;
+  //   int _totalMaalFinal = 0;
+  //   bool _dubliWin = false;
+  //   int _totalWinningPoints = 0;
 
-      // total maal count
-      if( _matchScores[i]['seen'] == true ){
-        _totalMaal +=  maalInt;
-        _totalMaalFinal +=  maalInt;
-      }
+  //   for(int i = 0; i < _matchScores.length; i++ ){
+  //     String maal = textEditingControllers[i].text;
+  //     int maalInt = (maal.length > 0) ? int.parse(maal) : 0;
+  //     _matchScores[i]['maal'] = maalInt;
+
+  //     // total maal count
+  //     if( _matchScores[i]['seen'] == true ){
+  //       _totalMaal +=  maalInt;
+  //       _totalMaalFinal +=  maalInt;
+  //     }
 
 
-      // find winner
-      if( _matchScores[i]['win'] == true ){
-        _winnerSelected = true;
-        _winIndex = i;
+  //     // find winner
+  //     if( _matchScores[i]['win'] == true ){
+  //       _winnerSelected = true;
+  //       _winIndex = i;
 
-        // dubli
-        if( _matchScores[i]['dubli'] ){
-          _dubliWin = true;
-          _totalMaalFinal = _totalMaalFinal + _settings[0]['seen'] + _settings[0]['dubli'];
-        }
-        else{
-          _totalMaalFinal +=  _settings[0]['seen'];
-        }
+  //       // dubli
+  //       if( _matchScores[i]['dubli'] ){
+  //         _dubliWin = true;
+  //         _totalMaalFinal = _totalMaalFinal + _settings[0]['seen'] + _settings[0]['dubli'];
+  //       }
+  //       else{
+  //         _totalMaalFinal +=  _settings[0]['seen'];
+  //       }
 
-      }
+  //     }
 
-    }
+  //   }
 
-    void updateTotalWinningPoints(_result){
-      // change positive to negative and vice versa
-      _totalWinningPoints = _totalWinningPoints + (_result * (-1));
-    }
+  //   void updateTotalWinningPoints(_result){
+  //     // change positive to negative and vice versa
+  //     _totalWinningPoints = _totalWinningPoints + (_result * (-1));
+  //   }
     
 
-    if( _winnerSelected ){
+  //   if( _winnerSelected ){
 
-      // calculate results
+  //     // calculate results
 
-      for(int i = 0; i < _matchScores.length; i++ ){
-        int _maal = _matchScores[i]['maal'];
-        bool _seen = _matchScores[i]['seen'];
-        bool _dubli = _matchScores[i]['dubli'];
-        bool _win = _matchScores[i]['win'];
+  //     for(int i = 0; i < _matchScores.length; i++ ){
+  //       int _maal = _matchScores[i]['maal'];
+  //       bool _seen = _matchScores[i]['seen'];
+  //       bool _dubli = _matchScores[i]['dubli'];
+  //       bool _win = _matchScores[i]['win'];
 
-        // winner will always be last
+  //       // winner will always be last
 
-        if( !_win ){
+  //       if( !_win ){
 
-          if( _dubliWin ){
+  //         if( _dubliWin ){
 
-            if( _settings[0]['enable_dubli'] == 1 ){
+  //           if( _settings[0]['enable_dubli'] == 1 ){
 
-              if( _seen ){
+  //             if( _seen ){
 
-                if(_dubli){
+  //               if(_dubli){
                   
-                    // won in dubli, seen, dubli, dubli enabled
-                    // less points
-                    int _results = maalSeen( _maal ) -  _totalMaal;
-                    _matchScores[i]['results'] = _results;
+  //                   // won in dubli, seen, dubli, dubli enabled
+  //                   // less points
+  //                   int _results = maalSeen( _maal ) -  _totalMaal;
+  //                   _matchScores[i]['results'] = _results;
                     
-                    // update total winning points
-                    updateTotalWinningPoints(_results);
+  //                   // update total winning points
+  //                   updateTotalWinningPoints(_results);
 
-                }
-                else{
-                  // won in dubli, seen, not dubli, dubli enabled
-                  int _results =  maalSeen( _maal ) - (_totalMaal + _settings[0]['seen'] + _settings[0]['dubli']);
-                  _matchScores[i]['results'] = _results;
+  //               }
+  //               else{
+  //                 // won in dubli, seen, not dubli, dubli enabled
+  //                 int _results =  maalSeen( _maal ) - (_totalMaal + _settings[0]['seen'] + _settings[0]['dubli']);
+  //                 _matchScores[i]['results'] = _results;
                   
-                  // update total winning points
-                  updateTotalWinningPoints( _results );
+  //                 // update total winning points
+  //                 updateTotalWinningPoints( _results );
 
-                }
+  //               }
 
-              }
-              else{
-                // won in dubli, not seen, dubli enabled
-                int _results = maalNotSeen(_totalMaal + _settings[0]['dubli']); 
-                _matchScores[i]['results'] = _results;
+  //             }
+  //             else{
+  //               // won in dubli, not seen, dubli enabled
+  //               int _results = maalNotSeen(_totalMaal + _settings[0]['dubli']); 
+  //               _matchScores[i]['results'] = _results;
                   
-                // update total winning points
-                updateTotalWinningPoints(_results);
-              }
+  //               // update total winning points
+  //               updateTotalWinningPoints(_results);
+  //             }
 
-            }
-            else{
+  //           }
+  //           else{
 
-              // dubli not enabled
+  //             // dubli not enabled
               
-              if( _seen ){
-                // dubli not enabled
-                // won in dubli, seen
-                // same for dubli and no dubli
-                int _results = maalSeen( _maal ) -  (_totalMaal + _settings[0]['seen']);
-                _matchScores[i]['results'] = _results;
+  //             if( _seen ){
+  //               // dubli not enabled
+  //               // won in dubli, seen
+  //               // same for dubli and no dubli
+  //               int _results = maalSeen( _maal ) -  (_totalMaal + _settings[0]['seen']);
+  //               _matchScores[i]['results'] = _results;
 
-                // update total winning points
-                updateTotalWinningPoints(_results);
+  //               // update total winning points
+  //               updateTotalWinningPoints(_results);
 
-              }
-              else{
-                // won in dubli, not seen, dubli not enabled
-                int _results = maalNotSeen(_totalMaal); 
-                _matchScores[i]['results'] = _results;
+  //             }
+  //             else{
+  //               // won in dubli, not seen, dubli not enabled
+  //               int _results = maalNotSeen(_totalMaal); 
+  //               _matchScores[i]['results'] = _results;
 
-                // update total winning points
-                updateTotalWinningPoints(_results);
-              }
+  //               // update total winning points
+  //               updateTotalWinningPoints(_results);
+  //             }
 
-            }
+  //           }
 
-          }
-          else{
+  //         }
+  //         else{
 
-            // game not won in dubli
-            // regular points
+  //           // game not won in dubli
+  //           // regular points
 
-            if( _settings[0]['enable_dubli'] == 1 ){
+  //           if( _settings[0]['enable_dubli'] == 1 ){
 
-              if( _seen ){
+  //             if( _seen ){
 
-                if(_dubli){
+  //               if(_dubli){
                   
-                    // seen, dubli, dubli enabled
-                    // less points
-                    int _results = seenLessPoints(_maal, _totalMaal);
-                    _matchScores[i]['results'] = _results;
+  //                   // seen, dubli, dubli enabled
+  //                   // less points
+  //                   int _results = seenLessPoints(_maal, _totalMaal);
+  //                   _matchScores[i]['results'] = _results;
 
-                    // update total winning points
-                    updateTotalWinningPoints(_results);
+  //                   // update total winning points
+  //                   updateTotalWinningPoints(_results);
 
-                }
-                else{
-                  // seen, not dubli, dubli enabled
-                  int _results =  maalSeen( _maal ) - (_totalMaal + _settings[0]['seen']);
-                  _matchScores[i]['results'] = _results;
+  //               }
+  //               else{
+  //                 // seen, not dubli, dubli enabled
+  //                 int _results =  maalSeen( _maal ) - (_totalMaal + _settings[0]['seen']);
+  //                 _matchScores[i]['results'] = _results;
 
-                  // update total winning points
-                  updateTotalWinningPoints(_results);
-                }
+  //                 // update total winning points
+  //                 updateTotalWinningPoints(_results);
+  //               }
 
-              }
-              else{
-                // not seen, dubli enabled
-                int _results = maalNotSeen(_totalMaal); 
-                _matchScores[i]['results'] = _results;
+  //             }
+  //             else{
+  //               // not seen, dubli enabled
+  //               int _results = maalNotSeen(_totalMaal); 
+  //               _matchScores[i]['results'] = _results;
 
-                // update total winning points
-                updateTotalWinningPoints(_results);
-              }
+  //               // update total winning points
+  //               updateTotalWinningPoints(_results);
+  //             }
 
-            }
-            else{
+  //           }
+  //           else{
 
-              // dubli not enabled
+  //             // dubli not enabled
               
-              if( _seen ){
-                // dubli not enabled
-                // seen
-                // same for dubli and no dubli
-                int _results = maalSeen( _maal ) -  (_totalMaal + _settings[0]['seen']);
-                _matchScores[i]['results'] = _results;
+  //             if( _seen ){
+  //               // dubli not enabled
+  //               // seen
+  //               // same for dubli and no dubli
+  //               int _results = maalSeen( _maal ) -  (_totalMaal + _settings[0]['seen']);
+  //               _matchScores[i]['results'] = _results;
 
-                // update total winning points
-                updateTotalWinningPoints(_results);
+  //               // update total winning points
+  //               updateTotalWinningPoints(_results);
 
-              }
-              else{
-                // not seen, dubli not enabled
-                int _results = maalNotSeen(_totalMaal); 
-                _matchScores[i]['results'] = _results;
+  //             }
+  //             else{
+  //               // not seen, dubli not enabled
+  //               int _results = maalNotSeen(_totalMaal); 
+  //               _matchScores[i]['results'] = _results;
 
-                // update total winning points
-                updateTotalWinningPoints(_results);
-              }
+  //               // update total winning points
+  //               updateTotalWinningPoints(_results);
+  //             }
 
-            }
+  //           }
 
-          }
+  //         }
           
-        }
+  //       }
         
-      }
+  //     }
 
-      // update winner results
-      _matchScores[_winIndex]['results'] = _totalWinningPoints;
+  //     // update winner results
+  //     _matchScores[_winIndex]['results'] = _totalWinningPoints;
 
-    } 
-    else{
-      // winner not selected
+  //   } 
+  //   else{
+  //     // winner not selected
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Please select a winner'),
-            // content: Text(
-            //   'You need a player'
-            // ),
-            actions: <Widget>[
-              MaterialButton(
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                color: Colors.blue,
-                textColor: Colors.white,
-                child: Text('OK'),
-                elevation: 0,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        }
-      );
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           title: Text('Please select a winner'),
+  //           // content: Text(
+  //           //   'You need a player'
+  //           // ),
+  //           actions: <Widget>[
+  //             MaterialButton(
+  //               padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+  //               color: Colors.blue,
+  //               textColor: Colors.white,
+  //               child: Text('OK'),
+  //               elevation: 0,
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //             ),
+  //           ],
+  //         );
+  //       }
+  //     );
       
-    }
+  //   }
 
-    Navigator.of(context).pushReplacementNamed('/results', arguments: {'data': _matchScores, 'totalMaal' : _totalMaalFinal, 'winner' : _matchScores[_winIndex]});
+  //   Navigator.of(context).pushReplacementNamed('/results', arguments: {'data': _matchScores, 'totalMaal' : _totalMaalFinal, 'winner' : _matchScores[_winIndex]});
 
-  } // function end
+  // } // function end
 
 
 } // main class

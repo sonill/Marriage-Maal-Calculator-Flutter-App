@@ -36,7 +36,7 @@ class ResultScreen extends StatelessWidget {
           padding: EdgeInsets.all(globals.mainContainerPadding),
           child: Column(
             children: <Widget>[
-              ResultsUI( {'name' : 'Total Maal', 'results' : args['totalMaal'], 'titleRow' : true}),
+              ResultsUI( {'name' : 'Total Maal', 'results' : args['totalMaal'], 'dubli' : args['dubliWin'], 'titleRow' : true, 'settings' : args['settings'] }),
               ResultsUI( _winnerData),
 
               Column(

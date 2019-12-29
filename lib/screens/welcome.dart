@@ -49,21 +49,33 @@ class WelcomeScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          svg,
-          Padding(
-            padding: const EdgeInsets.only(top: 10, bottom: 20),
-            child: Text(
-              'Marriage Maal Calculator',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Roboto',
+          Flexible(
+            flex: 3,
+            child: Container(
+              padding: const EdgeInsets.only(top: 10, bottom: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  svg,
+                  Text(
+                    'Marriage Maal Calculator',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Roboto',
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
           _button,
-          SizedBox(height: 40),
-          Text('www.sanil.com.np'),
+          Flexible(
+            child: Container(
+              alignment: Alignment.center,
+              child: Text('www.sanil.com.np')
+            )
+          ),
         ],
       ),
     );
@@ -80,6 +92,7 @@ class WelcomeScreen extends StatelessWidget {
           return _showWelcomeScreen(context, playersDataModel.playersName);
         }
         else{
+          
           return Center(
             child: CircularProgressIndicator(),
           );
